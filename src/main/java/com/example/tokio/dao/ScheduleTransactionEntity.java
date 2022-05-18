@@ -3,7 +3,7 @@ package com.example.tokio.dao;
 
 public class ScheduleTransactionEntity {
 
-    private long id;
+    private String id;
     private String sender;
     private String receiver;
     private double amount;
@@ -14,11 +14,11 @@ public class ScheduleTransactionEntity {
     private double fee;
     private int days;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

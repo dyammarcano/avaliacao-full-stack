@@ -1,6 +1,8 @@
 package com.example.tokio.util;
 
 import java.math.BigInteger;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -67,5 +69,44 @@ public class Util {
         }
         BigInteger bi = new BigInteger(value.toString());
         return bi.intValue();
+    }
+
+    /**
+     * String to binary.
+     *
+     * @param value the value
+     * @return the string
+     */
+    public static Blob stringToBinary(String value) {
+        try {
+            return new javax.sql.rowset.serial.SerialBlob(value.getBytes());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Binary to string.
+     *
+     * @param value the value
+     * @return the string
+     */
+    public static String binaryToString(Blob value) {
+        try {
+            return new String(value.getBytes(1, (int) value.length()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Generate uuid v4.
+     *
+     * @return the string
+     */
+    public static String generateUUID() {
+        return java.util.UUID.randomUUID().toString();
     }
 }

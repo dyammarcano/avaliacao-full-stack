@@ -2,6 +2,8 @@ package com.example.tokio.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.sql.Blob;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UtilTest {
@@ -35,5 +37,13 @@ class UtilTest {
     void daysToSeconds() {
         long result = Util.daysToSeconds(1);
         assertEquals(86400, result);
+    }
+
+    @Test
+    void stringToBinaryAndBack() {
+        String s = "Hello World";
+        Blob result = Util.stringToBinary(s);
+        assert result != null;
+        assertEquals(s, Util.binaryToString(result));
     }
 }

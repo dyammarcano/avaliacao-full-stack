@@ -40,7 +40,7 @@ public class HomeController {
      * @return 201
      */
     @PostMapping("/update/{id}")
-    public ResponseEntity<ScheduleTransactionEntity> getById(@Valid @RequestBody ScheduleTransactionDTO scheduleTransactionDto, @PathVariable(value = "id") long id) {
+    public ResponseEntity<ScheduleTransactionEntity> getById(@Valid @RequestBody ScheduleTransactionDTO scheduleTransactionDto, @PathVariable(value = "id") String id) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.update(scheduleTransactionDto, id));
     }
@@ -52,7 +52,7 @@ public class HomeController {
      * @return 204 status code
      */
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity remove(@PathVariable(value = "id") long id) {
+    public ResponseEntity remove(@PathVariable(value = "id") String id) {
 
         scheduleService.delete(id);
         return ResponseEntity.noContent().build();
@@ -65,7 +65,7 @@ public class HomeController {
      * @return 200 status code with schedule entity
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ScheduleTransactionEntity> getById(@PathVariable(value = "id") long id) {
+    public ResponseEntity<ScheduleTransactionEntity> getById(@PathVariable(value = "id") String id) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.getById(id));
     }

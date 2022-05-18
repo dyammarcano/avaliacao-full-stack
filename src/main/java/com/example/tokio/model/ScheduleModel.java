@@ -1,6 +1,9 @@
 package com.example.tokio.model;
 
+import com.example.tokio.util.Util;
+
 import javax.persistence.*;
+import java.sql.Blob;
 
 @Entity
 @Table(name = "scheduleTransfer")
@@ -9,6 +12,10 @@ public class ScheduleModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @Lob
+    @Column(nullable = false, length = 6)
+    private Blob uuid;
 
     @Column(nullable = false, length = 6)
     private String sender;
@@ -33,6 +40,14 @@ public class ScheduleModel {
 
     @Column(nullable = false, length = 10)
     private double fee;
+
+    public String getUuid() {
+        return Util.binaryToString(uuid);
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = Util.stringToBinary(uuid);
+    }
 
     public long getId() {
         return id;
@@ -118,6 +133,7 @@ public class ScheduleModel {
             ", fee=" + fee +
             ", status='" + status + '\'' +
             ", type='" + type + '\'' +
+            ", uuid='" + getUuid() + '\'' +
             '}';
     }
 }
