@@ -5,6 +5,7 @@ import com.example.tokio.dao.ScheduleTransactionEntity;
 import com.example.tokio.dto.ScheduleTransactionDTO;
 import com.example.tokio.model.ScheduleModel;
 import com.example.tokio.repository.ScheduleRepository;
+import com.example.tokio.util.Util;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 public class ScheduleService {
@@ -39,13 +41,16 @@ public class ScheduleService {
 
         try {
             double fee = FeeCalculatorBO.feeByAmount(scheduleModel.getDate(), scheduleModel.getSchedule(), scheduleModel.getAmount());
+            scheduleModel.setUuid(Util.generateUUID());
             scheduleModel.setFee(fee);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         scheduleModel = scheduleRepository.save(scheduleModel);
-        return modelMapper.map(scheduleModel, ScheduleTransactionEntity.class);
+        ScheduleTransactionEntity map = modelMapper.map(scheduleModel, ScheduleTransactionEntity.class);
+        map.setId(scheduleModel.getUuid());
+        return map;
     }
 
     /**
@@ -55,7 +60,7 @@ public class ScheduleService {
      * @param id schedule transaction id
      * @return ScheduleTransactionEntity
      */
-    public ScheduleTransactionEntity update(ScheduleTransactionDTO scheduleTransactionDTO, Long id) {
+    public ScheduleTransactionEntity update(ScheduleTransactionDTO scheduleTransactionDTO, String id) {
 
         ScheduleModel scheduleModel = modelMapper.map(scheduleTransactionDTO, ScheduleModel.class);
 
@@ -69,7 +74,7 @@ public class ScheduleService {
 
         double finalFee = fee;
         ScheduleModel finalScheduleModel = scheduleModel;
-        scheduleModel = scheduleRepository.findById(id).map(schedule -> {
+        scheduleModel = scheduleRepository.findByUuid(Util.stringToBinary(id)).map(schedule -> {
             schedule.setSchedule(finalScheduleModel.getSchedule());
             schedule.setAmount(finalScheduleModel.getAmount());
             schedule.setDate(finalScheduleModel.getDate());
@@ -80,12 +85,11 @@ public class ScheduleService {
             schedule.setType(finalScheduleModel.getType());
 
             return scheduleRepository.save(schedule);
-        }).orElseGet(() -> {
-            finalScheduleModel.setId(id);
-            return scheduleRepository.save(finalScheduleModel);
-        });
+        }).orElseGet(() -> scheduleRepository.save(finalScheduleModel));
 
-        return modelMapper.map(scheduleModel, (Type) ScheduleTransactionEntity.class);
+        ScheduleTransactionEntity map = modelMapper.map(scheduleModel, ScheduleTransactionEntity.class);
+        map.setId(scheduleModel.getUuid());
+        return map;
     }
 
     /**
@@ -98,7 +102,7 @@ public class ScheduleService {
         List<ScheduleTransactionEntity> scheduleTransactionEntities = new ArrayList<>();
         scheduleRepository.findAll().forEach(schedule -> {
             ScheduleTransactionEntity scheduleTransactionEntity = new ScheduleTransactionEntity();
-            scheduleTransactionEntity.setId(schedule.getId());
+            scheduleTransactionEntity.setId(schedule.getUuid());
             scheduleTransactionEntity.setSchedule(schedule.getSchedule());
             scheduleTransactionEntity.setAmount(schedule.getAmount());
             scheduleTransactionEntity.setDate(schedule.getDate());
@@ -119,11 +123,11 @@ public class ScheduleService {
      * @param id schedule id
      * @return scheduleTransactionEntity
      */
-    public ScheduleTransactionEntity getById(Long id) {
+    public ScheduleTransactionEntity getById(String id) {
 
         ScheduleTransactionEntity scheduleTransactionEntity = new ScheduleTransactionEntity();
-        scheduleRepository.findById(id).ifPresent(schedule -> {
-            scheduleTransactionEntity.setId(schedule.getId());
+        scheduleRepository.findByUuid(Util.stringToBinary(id)).ifPresent(schedule -> {
+            scheduleTransactionEntity.setId(schedule.getUuid());
             scheduleTransactionEntity.setSchedule(schedule.getSchedule());
             scheduleTransactionEntity.setAmount(schedule.getAmount());
             scheduleTransactionEntity.setDate(schedule.getDate());
@@ -142,8 +146,8 @@ public class ScheduleService {
      *
      * @param id schedule transaction id
      */
-    public void delete(Long id) {
+    public void delete(String id) {
 
-        scheduleRepository.deleteById(id);
+        scheduleRepository.deleteByUuid(Util.stringToBinary(id));
     }
 }
